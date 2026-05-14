@@ -1,0 +1,141 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: prices
+    description: Price search operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /prices/search:
+    get:
+      operationId: searchPrices
+      tags: [prices]
+      summary: Search for product prices
+      description: Searches the web for the cheapest current price for a given product and returns direct links
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+          description: Product name to search for
+      responses:
+        "200":
+          description: List of price results sorted by price ascending
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PriceResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /prices/popular:
+    get:
+      operationId: getPopularSearches
+      tags: [prices]
+      summary: Get popular product searches
+      description: Returns a list of popular product search suggestions
+      responses:
+        "200":
+          description: List of popular searches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PopularSearch"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    PriceResult:
+      type: object
+      required:
+        - title
+        - url
+        - store
+        - price
+        - currency
+        - publishedDate
+      properties:
+        title:
+          type: string
+          description: Product title from the store
+        url:
+          type: string
+          description: Direct link to the product page
+        store:
+          type: string
+          description: Store/shop name
+        price:
+          type: number
+          description: Product price as a number
+        priceText:
+          type: ["string", "null"]
+          description: Raw price string from the page
+        currency:
+          type: string
+          description: Currency code e.g. PLN, USD
+        imageUrl:
+          type: ["string", "null"]
+          description: Product image URL if available
+        publishedDate:
+          type: string
+          description: Date the price was retrieved
+        favicon:
+          type: ["string", "null"]
+          description: Store favicon URL
+    PopularSearch:
+      type: object
+      required:
+        - query
+        - category
+      properties:
+        query:
+          type: string
+        category:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string

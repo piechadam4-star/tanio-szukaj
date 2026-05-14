@@ -1,0 +1,16 @@
+[build]
+  command = "pnpm install && pnpm --filter @workspace/price-finder run build"
+  publish = "artifacts/price-finder/dist/public"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NODE_ENV = "production"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Price Finder"
+version = "1.0.0"
+id = "artifacts/price-finder"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25365
+
+[services.development]
+run = "pnpm --filter @workspace/price-finder run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/price-finder", "run", "build" ]
+publicDir = "artifacts/price-finder/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25365"
+BASE_PATH = "/"
